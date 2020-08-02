@@ -1,0 +1,162 @@
+[
+    {
+        "id": "d8b4abc7-2952-5302-9230-d0da78a42105",
+        "title": "Corvid Tutorial: Creating a Show-More Link",
+        "content": "\nHi everyone,\n\nI was wondering if anyone could help me with this?\n\nI have followed the tutorial to set up a collapsable section of text with the read more read less functionality. The text is now not showing on my published site at all. I can't see any issues and wondered if anyone could have a quick look over it for me? The code I used from the Corvid tutorial is below and my site is https://www.businessnetwork.healthygirlhq.com\n\nThanks so much in advance to anyone that can help \n\nRacheal \n\n$w.onReady(function () {\nlet fullText; // variable to hold the full text\nlet shortText; // variable to hold the short version of the text\n// how many characters to include in the shortened version\nconst shortTextLength = 40;\n// read the full text and store it in the fullText variable\nfullText = $w(\"#text5\").text;\n// grab the number of characters defined in shortTextLength and store them in the shortText variable\nshortText = fullText.substr(0, shortTextLength) + \"...\";\n// set the contents of the text element to be the short text\n$w(\"#text5\").text = shortText;\n});\nexport function button5_click(event) {\n// check the contents of the text element \nif ($w(\"#text5\").text === shortText) {\n// if currently displaying short text, display the full text\n$w(\"#text5\").text = fullText;\n$w(\"#button5\").label = \"Show less\"; \n} else {\n// if currently displaying full text, display the short text\n$w(\"#text5\").text = shortText;\n$w(\"#button5\").label = \"Show more\";\n}\n}",
+        "userEmail": "cadge@un.lb",
+        "creationTime": 1526491512242,
+        "label":["private-data"]
+    },
+    {
+        "id": "3e738541-095d-55bd-97f5-e432a95e0df6",
+        "title": "async function with a foreach loop",
+        "content": " Hi guys! \n \n I am getting better but still running into some dead ends with my coding :) \nThis is what I am trying to do:\nI have crated a time-table matrix as collection: Gruppenkalender (see pic1). \n\n \n\nThe idea is that whenever I open the time-table site, the time-table-collection will be cleared, then filled with data from a query function and then finally populates the table on the site.  \n\n \n\n  \nThe code works. I guess it could be a bit more elegant but ok… 😊\nThe problem is, that I am running into a time-out:\nWhen the site loads, I am getting maybe 2 of 15 entries. \nWhen I click button10/Neu it executes the function again and I am getting more and more results.  \nI changed now from a async/await to a .then function but didn’t change much. \n\n Button11/Refresh does refresh the dataset connected to the table and is not changing anything. So I guess it’s the function.\n\nFrontend:\n\nimport Data from '-data'; \nimport {GruppenKalenderReset} from 'backend/Gruppenkalender'; \nimport {GruppenKalenderAktuell} from 'backend/Gruppenkalender';  \n\n$w.onReady(async function () { \n$w('#repeater5').expand() \nGruppenKalenderReset().then(() => { \nGruppenKalenderAktuell().then(() => { \n$w('#dataset1').refresh() })}) $w('#dataset1').setFilter(Data.filter().contains(\"title\", \"Montag\"))  });  \n\nexport function dropdown1_change(event) { \nconst filterValue = $w(\"#dropdown1\").value $w('#dataset1').setFilter(Data.filter().contains(\"title\", filterValue)) }  \n\nexport async function button9_click(event) {     \nGruppenKalenderReset() .then(() => {     \n$w('#dataset1').refresh()}) }  \n\nexport async function button10_click(event) {     GruppenKalenderAktuell().then(() => {         \n$w('#dataset1').refresh()}) }  \n\nexport function button11_click(event) {     \n$w('#dataset1').refresh() } \nBackEnd:\n\nimport Data from \"-data\";\n\nexport function GruppenKalenderReset() { \nreturn Data.query(\"Gruppenkalender\")         \n .limit(500)         \n .find()         \n .then((results) => {             \nresults.items.forEach((item) => {                 \n item.lyra = null                 \n item.balo = null                 \n item.omego = null                 \n item.amadeo = null                 \n item.pablo = null                 \n item.tymo = null                 \n item.diego = null                 \n item.myro = null \nreturn Data.update(\"Gruppenkalender\", item)             \n});          \n}) } \n \n \n\n\nexport function GruppenKalenderAktuell() { \nlet GruppentrainingP = \"b188f84c-bf81-4ab6-86bd-da071f430bf3\"     Data.query(\"AktuellerBetreuer\")         \n .limit(200)         \n .ge('ende', (new Date()))         \n .eq(\"produkt\", GruppentrainingP)         \n .or(             \n   Data.query(\"AktuellerBetreuer\")                  \n   .isEmpty('ende')             \n   .eq(\"produkt\", GruppentrainingP)         ) \n .find() // Run the query         \n.then(res => {             \nres.items.forEach((itemBT) => {  \n\nData.query(\"Gruppentraining\")                     \n.limit(500)                     \n.include(\"gerate\")                     \n.eq(\"aktuellerBetreuer\", itemBT._id)                     \n.find()                     \n.then((results) => {                         \nresults.items.forEach((item) => { \n\nlet TimeSplitter = item.anfang.split(\":\");  \nlet hour = (TimeSplitter[0]);  \nlet Minutes = (TimeSplitter[1]);  \nlet Time = hour.padStart(2, '0') + \":\" + Minutes.padStart(2, '0')  \nlet Geraet = item.gerate.title.toLowerCase()  \n\nData.query(\"Gruppenkalender\")                                 \n.limit(1)                                 \n.eq(\"title\", item.title)                                 \n.eq(\"anfang\", Time) \n.find()                                 \n.then((results2) => { \n let data = results2.items[0]  //console  //  let data = results2.  \n if (Geraet === \"lyra\") { data.lyra = item.kunde }  \n if (Geraet === \"balo\") { data.balo = item.kunde }  \n if (Geraet === \"omego\") { data.omego = item.kunde }  \n if (Geraet === \"amadeo\") { data.amadeo = item.kunde }  \n if (Geraet === \"pablo\") { data.pablo = item.kunde }  \n if (Geraet === \"tymo\") { data.tymo = item.kunde }  \n if (Geraet === \"diego\") { data.diego = item.kunde }  \n if (Geraet === \"myro\") { data.myro = item.kunde }  //console.log(data) \n  Data.update(\"Gruppenkalender\", data)                                         .then((results3) => {  \n let item3 = results3; //see item below                                                                                     \n  })                                         \n .catch((err) => {  let errorMsg = err;                                         });                                 \n  })                         \n })                     \n  })             \n })         \n  }) } \n\n        \n\n \n                                   \n\n\nAny idea how I get this baby workin and more solid?\n\n\n",
+        "userEmail": "un@atucopud.es",
+        "creationTime": 1542003362796,
+        "label":["private-data"]
+    },
+    {
+        "id": "2baec6f8-9cde-5b7f-b8ba-697bfe7f0b9b",
+        "title": "Display column images in gallery",
+        "content": " I have 4 image columns per item(row) and filtered data set with item id. I'd like to show them in gallery. Is it possible without coding ? I think gallery can only show row data. If coding required, can I have some samples ? thanks.",
+        "userEmail": "cojza@orivibu.bh",
+        "creationTime": 1519103713518,
+        "label":["private-data"]
+    },
+    {
+        "id": "6b6dde63-e310-5c33-8c93-ae3172a4f5f2",
+        "title": "Dear ,",
+        "content": "I have been trying to filter search my website, but for some reason my search result is blank as follows:\n \nAnd this is my code\n\n \nPlease kindly advise what I do wrong.\nThank you in advance\n\nBest,\nZP",
+        "userEmail": "uvoruom@bej.ni",
+        "creationTime": 1542526396191,
+        "label":["private-data"]
+    },
+    {
+        "id": "abea7b00-f147-54d1-88b6-60a91222531b",
+        "title": "Connect existing Image Gallery to database",
+        "content": "Hi, I have an existing static page with an image gallery with lots of images. I'd like to store the gallery with all the images in the database. How can I do that?\nJust to explain further I am converting a number of pages with image galleries to one dynamic page. ",
+        "userEmail": "cit@zom.li",
+        "creationTime": 1540918838122,
+        "label":["private-data"]
+    },
+    {
+        "id": "8fa89ee0-3389-5cf1-8008-95db578f6e53",
+        "title": "Date difference from database",
+        "content": "I would like to get the difference in _createdDate and _updatedDate . This value should be multiplied by 10. Any help, full code will be appreciated.\n \n",
+        "userEmail": "razuse@vouzusud.tg",
+        "creationTime": 1540027253261,
+        "label":["private-data"]
+    },
+    {
+        "id": "d1b3026b-c34c-5287-a9b3-edb5aaef91d6",
+        "title": "Basic Questions about Software Integration",
+        "content": "Good day :)\n\nI am having an auction/marketplace website developed for myself and Code was released at the same time so I am wondering if it is possible to do this in .  \n\nThis is the software I purchased:  http://ecommercemix.com/  - I also have hired a developer team.  \n\nMy questions are:\nCould we use the software above with ?  Or could we develop a custom auction platform in  at this point?  \n\nAny thoughts suggestions or tips?  \n\nThank you/Sarah",
+        "userEmail": "muvo@fuhjuc.bo",
+        "creationTime": 1539316082816,
+        "label":["private-data"]
+    },
+    {
+        "id": "b7151edd-06bf-5a26-b338-60bf851661ae",
+        "title": "Help I am a beginner in javascript!",
+        "content": "Hi i need help please! i'm a beginner at java script. i'm trying to use an onlick event to change the color of a button in my code, this button links to and other HTML file. Here is the HTML and CSS code.\n\n\nHTML code:\n\n<a  href=\"index.html\"><button  class=\"btn-hm\">HOME</button></a> \n\n<a href=\"Photogallery.html\"><button class=\"btn-gp\">Photo Gallery</button></a>\n\n\nCSS code: \n\n.btn-hm{\n\nfont-family: 'Mansalva', cursive;\ncolor:white;\ntext-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;\nborder: 4px solid white;\npadding:10px 22px;\nfont-size: 35px;\nborder-radius: 10%;\nbackground-color:gray;\ncursor: pointer;\ncursor: hand;   \n\n}\n\n.btn-gp{\n  padding:10px 22px;\n  font-size: 35px;\n border-radius: 10%;\n  font-family: 'Mansalva', cursive;\n  border: 4px solid white;\n  color: white;\ntext-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;\nbackground-color:gray;\ncursor: pointer;\n    cursor: hand;\n  }\n\nI've tried a few things in JS and it fail every time. please someone help me and explain what i need to doe  :(",
+        "userEmail": "wogel@foter.bn",
+        "creationTime": 1545625643857,
+        "label":["private-data"]
+    },
+    {
+        "id": "a18f9ec1-cc1d-5f58-ae85-e2c3cee90b27",
+        "title": "How did you make your website on a budget? Would  work? I am an artist\n",
+        "content": "So I am an artist and have 0 experience with websites at all. I am running on a limited budget and haven't made much money yet, but my gallery (and I guess me to some extent) is ranked in the top 10 in my big city (semi large state capital). I need to expand now and get a website, I am not going to sell any art off there as I am trying to stay high brow ish and am only selling at galleries and auctions, I just want to explain my art (it is very... unique) and provide images. Would six work for this? I'm just looking to show people what I am about and give a link on trip advisor as well as gove critics somewhere to look and contact me. My budget is like 300 (enough to use six but probably not a real designer) so what do you guys think https://cnv.to/",
+        "userEmail": "fusom@ireruveho.er",
+        "creationTime": 1517624146865,
+        "label":["private-data"]
+    },
+    {
+        "id": "9581d77e-edec-57d7-8626-72b57fa6037f",
+        "title": "Repeaters performance on a dynamic page",
+        "content": "Are 15 repeaters (each with 5 items) gonna be too much for a dynamic page to handle?\n\nEach item container will have a button, a text element and 3 pictures of 5 KBs each.\n\nWill this break the page?\n\nThoughts?",
+        "userEmail": "kapgip@ite.fo",
+        "creationTime": 1525545421561,
+        "label":["private-data"]
+    },
+    {
+        "id": "264a85a8-907d-51c5-9647-d25fa4b8f077",
+        "title": "Calendar",
+        "content": "Has anyone found any good solutions with integrating calendar bookings with  Code? I am looking for basic functionality such as the option to book dates, displaying availability and an add to calendar function. ",
+        "userEmail": "kiujuma@ul.ua",
+        "creationTime": 1529188631674,
+        "label":["private-data"]
+    },
+    {
+        "id": "426594ab-f798-525a-8744-e13dad736837",
+        "title": "Guide for Google reCAPTCHA v3\n",
+        "content": " General Settings To get the access to the Google reCAPTCHA v3 settings please go to System → Configuration → Sales → Google API and expand the Google ReCaptcha section. \nEnable — Enables module Site Key — fill in an individual site key generated for your store Secret Key — fill in an individual secret key generated for your storeHow to generate Site Keys and Secret Keys — To get a Site key and a Secret key click here. \n1. Set the label; \n2. Select the needed type of Captcha ( reCAPTCHA v3 for Checkbox Type of Captcha); \n3. Define the domain of your website; \n4. Tick the Terms of use checkbox; \n5. Press the Submit button. \nCopy the keys from this page: Go back to the backend of the module. Paste the Site key and the Secret key Forms — Pick the forms that need to be protected by Captcha via multi-select control. Custom Forms — Comma separated \n\nhttps://docsbay.net/guide-for-google-recaptcha-v3",
+        "userEmail": "dame@fuvcopug.bz",
+        "creationTime": 1517148137111,
+        "label":["private-data"]
+    },
+    {
+        "id": "93459bb4-eeba-5fb2-be68-91515c985b52",
+        "title": "Job scheduler - Not working",
+        "content": "I have a Job scheduler which I can not get to work:\n\nMy jobs.config :\n// /backend/jobs.config\n{\n \"jobs\": [\n    {\n       \"functionLocation\": \"/timer.check\",\n       \"description\": \"Check for events\",\n       \"executionConfig\": {\n         \"time\": \"13:52\", // mandatory, “hh:mm” format\n      }\n    },\n    {\n     \"functionLocation\": \"/timer.check\",\n     \"description\": \"Check for events 2\",\n     \"executionConfig\": {\n       \"time\": \"15:52\", // mandatory, “hh:mm” format\n      }\n    },\n    }\n  ]\n}\nMy function located in timer.js in the backend:\nexport function check () {\n    console.log(\"Checking for new events\")\n    clearInterval(interval)\n    let interval = setInterval(() => {\n        console.log(\"Checking for new events\")\n    },2000)\n}\nI am living in UTC + 2 and therefore made sure to subtract 2 hours from my current time to enter the correct time in UTC in the jobs.config.\n\n",
+        "userEmail": "wizo@uha.kn",
+        "creationTime": 1539154698723,
+        "label":["private-data"]
+    },
+    {
+        "id": "7a03b846-f2ff-54a2-86b3-911f524f55c5",
+        "title": "Remove or replace event listeners.",
+        "content": "Hello. I've created a wrapper for `$w` that disables adding of multiple event listeners to element, so for example, every new onClick will rewrite previous one, instead of adding new. (wraps all methods where name starts with 'on'). This way you can delete or replace event listeners.\n\nhttps://github.com/skorokhod-andrii/-event-wrapper\n\nLet me know if you find any bugs. Pull requests are welcome.",
+        "userEmail": "petzole@lewes.mr",
+        "creationTime": 1536055279676,
+        "label":["private-data"]
+    },
+    {
+        "id": "b1229a5b-7230-5142-86ba-cc1da320641e",
+        "title": "Pay How to collect shipping address information",
+        "content": "Hello this is my first forum post, so let me know if I can do anything differently in the future!\n\n\nI have a sock subscription website which sells socks every month.  In order to customize the  PaidPlans landing page, I have to code the page using the Pay API.\n\nEverything works fine, even the payment goes through.  The only problem is that the  \nPay.startPayment function does not prompt/return a shipping address.  So I don't know where to ship the goods.  The frustrating part is that if you use the regular  Store, the checkout page requires both the billing and shipping addresses.  As far as I can tell, there is no way to modify the lightbox that appears in order to collect more information.\n\nPlease let me know if there is indeed a way to import shipping info from the customers using Pay.\n\nA picture of the Pay payment collection lightbox:\n\n\n \n\nHere is the code I am using.  Again, it works, but I just need to add the extra shipping address.\n\n\nPage Code:\n\n\n\n$w.onReady(function () {\n\n const currentPlanObject = $w(\"#dynamicDataset\").getCurrentItem();\n const planId = currentPlanObject._id;\n const planPrice = currentPlanObject.price;\n\n  $w('#button1').onClick((event) => {\n\n let user = Users.currentUser;\n let isLoggedIn = user.loggedIn;\n if (!isLoggedIn) {\n      Users.promptLogin().then(() => {\n        processPlan(planId, planPrice);\n      })\n    } else {\n      processPlan(planId, planPrice);\n    }\n });\n});\n\nfunction processPlan(myId) {\n\n \n    PaidPlans.purchasePlan(myId).then(orderObject => {\n      Window.openLightbox(\"Contact\", orderObject)\n       .then((goForIt) => {\n if (goForIt) {\n         Pay.startPayment(orderObject.PayOrderId);\n       }\n      });\n    })\n \n}\n \n\n\nBackend code:\n\n\n \nimport Data from '-data';\n\nexport function PaidPlans_onPlanPurchased(event) {\n\n // Insert a title reflecting the type of transaction, and\n // the event's order object (json) into \n // the collection's data field.\n if (event.order.price.amount === 0) {\n let orderData = {\n \"title\": \"Free plan purchased\",\n \"data\": event.order\n        };\n        Data.insert(\"planEvents\", orderData);\n    } else {\n let orderData = {\n \"title\": \"Regular plan purchased\",\n \"data\": event.order\n        };\n        Data.insert(\"planEvents\", orderData);\n    }\n}\n\n\n\nLink to how it would look.  This is a product page, not a subscription page, but the problem is the same:\n https://reexlmain.site.com/nysc/stores/products \n\n",
+        "userEmail": "guc@cugiton.td",
+        "creationTime": 1525458376891,
+        "label":["private-data"]
+    },
+    {
+        "id": "caa8eff8-bca6-5e9e-abef-9fb97d30bb91",
+        "title": "Help with setFieldValue",
+        "content": "I have a item dynamic page where I made a form.\nI'll hide one of the fields and it must contain the same text of #text6 before save the form.\n\nI'm really bad in JavaScript and have no clue where is the mistake.\n\nThe code is:\n \nexport function button1_click(event, $w)\n {      \n        $w(\"#dataset1\").setFieldValue(\"codMold\", $w('#text6'));\n \n}\n\n\nBut the content of the field comes [object Object]\n\nI know probaly it's a dumb mistake, but I've tried everything i know =(\n\nI 'll really apreciate if some one help =)\n",
+        "userEmail": "cines@womco.pa",
+        "creationTime": 1518048320319,
+        "label":["private-data"]
+    },
+    {
+        "id": "c6d0f8f3-aee2-5d0b-bbe1-5b86a3c86667",
+        "title": "'Dropdown List' with options that can link to pages.",
+        "content": "Looking for a bit of help creating an interactive dropdown list. \nTo avoid confusion, I'm not looking for a Menu Navigation Bar dropdown it has to be separate. \nIf this has already been asked, please point me in the right direction. \n\n \n \nI'm trying to create a dropdown list on my home page that links to other pages. \n- It needs 6 options (pages) inside of it.\n- These will then link to their own category pages. (see picture below)  \n\n \nWhen you click one of those options, I would like it to link to the page it relates to.\n\ni.e Adventure in the dropdown will link to the Adventure Tour page. \n\n\nHow did I get the dropdown? \nI turned on the Developer options and grabbed a dropdown box from the user input section. \nTo my understanding these dropdowns are usually for forms, but i've heard that they can be used for what I'm trying to do here. \n\nCurrently, I only have the design setup (pictured above) and you can click the items. But none of those items are linked to anything, as I don't know how to link them to a page or IF that's even possible. \n\nIs there some coding I can do to get this working? \nOr another option of a dropdown list/menu that I could work with?\n\n \n\nI appreciate any help on this, I've been staring at it for hours without any results.\n\n:)",
+        "userEmail": "ru@fabuni.pt",
+        "creationTime": 1520573428980,
+        "label":["private-data"]
+    },
+    {
+        "id": "6aa0a75c-32f0-522b-bbe6-807c51ada4b7",
+        "title": "Adjusting website content to the size of the ​screen its being viewed on",
+        "content": "Hello!\nI have been using  to host my website for the last 3 years and a complete revamp is underway. – The editing has predomenantly been done on my 13\" laptop, but decided to shift over to my 23\" editing screen to realise that the content is tiny compared to the size of the window. \nIs there any function or code I can add to allow the content to adjust to the size of the screen it's being viewed on? \nAs a photographer with a website to showcase my portfolio, its quite disappointing to have to work with a format that is stuck at the size it's been sized to and doesn't adjust to the screen size accordingly.\n\nCheers!",
+        "userEmail": "zopme@kicu.ma",
+        "creationTime": 1516191466216,
+        "label":["private-data"]
+    },
+    {
+        "id": "cd4fbf3a-de0b-5e3a-8ec1-37ed072f0e91",
+        "title": "Filtering an array",
+        "content": "I have some code finding records with a queryreferenced function but I want to remove any records that have a live field of false so that I can add locations to the Items collection without them showing on the map straightaway.  The map is seen at abovedown.co.uk/map\nfunction getLocationsMap() {\n var iCat\n if ($w('#icategory').value.length > 0) {\n    iCat = $w('#icategory').value\n  } else {\n    iCat = \"e8dd0d65-dc99-4af1-9506-da1cd9beed38\"\n  }\n\n return Data.queryReferenced(\"Category\", iCat, \"Items\")\n    .then((results) => {\n return results.items; // items is an array of locations from the collection\n    })\n    .catch((err) => {\n let errorMsg = err;\n    });\n\n}\nMay be I could filter them in the recieving code?\nfunction sendLocations() {\n  getLocationsMap()\n  .then((locations) => {\n\n let markers = [];\n for (let i = 0; i < locations.length; i++) {\n let loc = locations[i];\n      markers.push({title: loc.title, position: {lat: loc.lat, lng: loc.long}});\n    }\n    $w('#htmlMap').postMessage({markers});\n  });\n}\nAlso I don't understand why I need a return on the data line and the results.items but if I remove either it no longer shows the locations on the map.  Your help is much appreciated.",
+        "userEmail": "duso@calo.ps",
+        "creationTime": 1520211360358,
+        "label":["private-data"]
+    },
+    {
+        "id": "6860d043-f551-58c8-84d6-f9e6a8cb0cb2",
+        "title": "Search bar for my  store",
+        "content": "hello Friends,\nCan anyone please help me in creating a search bar for my  store page. So my customers could search any particular product from my  store.\nThank you",
+        "userEmail": "sasi@ezougu.net",
+        "creationTime": 1535854919274,
+        "label":["private-data"]
+    }
+]
