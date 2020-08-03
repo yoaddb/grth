@@ -5,7 +5,8 @@ import {createApiClient, Ticket} from './api';
 export type AppState = {
 	tickets?: Ticket[],
 	search: string,
-	isHovered: boolean[] 
+	isHovered: boolean[],
+	hiddenTickets: any[]
 }
 
 const api = createApiClient();
@@ -14,7 +15,8 @@ export class App extends React.PureComponent<{}, AppState> {
 
 	state: AppState = {
 		search: '',
-		isHovered: [false]
+		isHovered: [false],
+		hiddenTickets: []
 		}
 
 	searchDebounce: any = null;
@@ -44,7 +46,17 @@ export class App extends React.PureComponent<{}, AppState> {
 	handleHideClick= (id:string) => {
 		if(this.state.tickets) {
 			this.setState({
-				tickets: this.state.tickets.filter(ticket => ticket.id !== id)
+				tickets: this.state.tickets.filter(ticket => ticket.id !== id),
+				hiddenTickets: [...this.state.hiddenTickets, this.state.tickets.find(t => t.id===id)]
+			})
+		}
+	}
+
+	handleRestore = () => {
+		if(this.state.tickets) {
+			this.setState({
+			tickets: [...this.state.tickets, ...this.state.hiddenTickets],
+			hiddenTickets: []
 			})
 		}
 	}
@@ -79,7 +91,8 @@ export class App extends React.PureComponent<{}, AppState> {
 
 		this.searchDebounce = setTimeout(async () => {
 			this.setState({
-				search: val
+				search: val,
+				tickets: this.state.tickets ? [...this.state.tickets] : []
 			});
 		}, 300);
 	}
@@ -92,7 +105,7 @@ export class App extends React.PureComponent<{}, AppState> {
 			<header>
 				<input type="search" placeholder="Search..." onChange={(e) => this.onSearch(e.target.value)}/>
 			</header>
-			{tickets ? <div className='results'>Showing {tickets.length} results</div> : null }	
+			{tickets ? <div className='results'>Showing {tickets.length} results ({this.state.hiddenTickets.length} hidden tickets) <span onClick={this.handleRestore} style={{color:'blue'}}>restore</span></div> : null }	
 			{tickets ? this.renderTickets(tickets) : <h2>Loading..</h2>}
 		</main>)
 	}
