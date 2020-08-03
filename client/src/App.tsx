@@ -27,8 +27,7 @@ export class App extends React.PureComponent<{}, AppState> {
 	}
 
 	handleMouseEnter = (index: number) => {
-		console.log("object")
-		const isHoveredClone = this.state.isHovered;
+		const isHoveredClone = [...this.state.isHovered];
 		isHoveredClone[index] = true;
 		this.setState({isHovered: isHoveredClone})
 			
@@ -36,7 +35,7 @@ export class App extends React.PureComponent<{}, AppState> {
 	}
 
 	handleMouseLeave = (index:number) => {
-		const isHoveredClone = this.state.isHovered;
+		const isHoveredClone = [...this.state.isHovered];
 		isHoveredClone[index] = false;
 		this.setState({isHovered: isHoveredClone})
 			
