@@ -15,7 +15,7 @@ export class App extends React.PureComponent<{}, AppState> {
 
 	state: AppState = {
 		search: '',
-		isHovered: [false],
+		isHovered: [],
 		hiddenTickets: []
 		}
 
@@ -28,25 +28,22 @@ export class App extends React.PureComponent<{}, AppState> {
 		});
 	}
 
-	handleMouseEnter = (index: number) => {
+	handleMouseOver = (index: number) => {
 		const isHoveredClone = [...this.state.isHovered];
 		isHoveredClone[index] = true;
 		this.setState({isHovered: isHoveredClone})
-			
-		
 	}
 
-	handleMouseLeave = (index:number) => {
+	handleMouseOut = (index:number) => {
 		const isHoveredClone = [...this.state.isHovered];
 		isHoveredClone[index] = false;
 		this.setState({isHovered: isHoveredClone})
-			
 	}
 
-	handleHideClick= (id:string) => {
+	handleHideClick = (id:string) => {
 		if(this.state.tickets) {
 			this.setState({
-				tickets: this.state.tickets.filter(ticket => ticket.id !== id),
+				tickets: [...this.state.tickets.filter(ticket => ticket.id !== id)],
 				hiddenTickets: [...this.state.hiddenTickets, this.state.tickets.find(t => t.id===id)]
 			})
 		}
@@ -65,7 +62,8 @@ export class App extends React.PureComponent<{}, AppState> {
 
 		return (<ul className='tickets'>
 			{tickets.map((ticket, index) => (
-			<li key={ticket.id} className='ticket' onMouseEnter={() => this.handleMouseEnter(index)} onMouseLeave={ () => this.handleMouseLeave(index)}>
+			<li key={ticket.id} className='ticket' onMouseOver={() => this.handleMouseOver(index)} onMouseOut={ () => this.handleMouseOut(index)}>
+				{this.state.isHovered[index] ? <button type="button" className='btn--hide' onClick={() => this.handleHideClick(ticket.id)}>hide</button> : null}
 				<h5 className='title'>{ticket.title}</h5>
 				<h5 className='title'>{ticket.content}</h5>
 				<footer>
@@ -79,7 +77,6 @@ export class App extends React.PureComponent<{}, AppState> {
 					</div>
 					</div>
 				</footer>
-				{this.state.isHovered[index] && <button onClick={() => this.handleHideClick(ticket.id)}>hide</button>}
 			</li>
 			))}
 		</ul>);
@@ -91,10 +88,11 @@ export class App extends React.PureComponent<{}, AppState> {
 
 		this.searchDebounce = setTimeout(async () => {
 			this.setState({
-				search: val,
-				tickets: this.state.tickets ? [...this.state.tickets] : []
+				search: val
 			});
 		}, 300);
+
+
 	}
 
 	render() {	
