@@ -107,3 +107,23 @@ body {
 		}
 	}
 }
+
+.wrapper{
+	display: flex;
+}
+
+.wrapper--button{
+	flex-direction: row;
+}
+
+.btn-lbl{
+	background-color: cyan;
+	color: black;
+	border-color: white;
+	text-decoration: none;
+	margin-left: 10px
+}
+.label-wrapper{
+	display: inline;
+	margin-left: 500px;
+}
